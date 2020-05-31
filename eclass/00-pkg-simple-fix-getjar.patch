@@ -1,23 +1,37 @@
---- java-pkg-simple.eclass.orig	2020-05-30 14:07:13.402563702 +0800
-+++ java-pkg-simple.eclass	2020-05-30 14:09:16.026562572 +0800
-@@ -86,6 +86,7 @@
+--- java-pkg-simple.eclass.orig	2020-05-31 22:40:30.838792287 +0800
++++ java-pkg-simple.eclass	2020-05-31 22:43:47.592790474 +0800
+@@ -45,6 +45,12 @@
+ # Extra list of colon separated path elements to be put on the
+ # classpath when compiling sources.
+ 
++# @ECLASS-VARIABLE: JAVA_CLASSPATH_EXTRA
++# @DEFAULT_UNSET
++# @DESCRIPTION:
++# Extra list of comma or space separated list of java packages
++# which is needed only during compiling sources.
++
+ # @ECLASS-VARIABLE: JAVA_SRC_DIR
+ # @DEFAULT_UNSET
+ # @DESCRIPTION:
+@@ -86,6 +92,8 @@
  # classes to ${JAVA_JAR_FILENAME}.
  java-pkg-simple_src_compile() {
  	local sources=sources.lst classes=target/classes apidoc=target/api
-+	local getjars_args="--with-dependencies"
++	local deep_jars="--with-dependencies"
++	local buildonly_jars="--build-only"
  
  	# auto generate classpath
  	java-pkg_gen-cp JAVA_GENTOO_CLASSPATH
-@@ -97,7 +98,11 @@
+@@ -97,7 +105,11 @@
  	# compile
  	local classpath="${JAVA_GENTOO_CLASSPATH_EXTRA}" dependency
  	for dependency in ${JAVA_GENTOO_CLASSPATH}; do
 -		classpath="${classpath}:$(java-pkg_getjars ${dependency})" \
-+		classpath="${classpath}:$(java-pkg_getjars ${getjars_args} ${dependency})" \
++		classpath="${classpath}:$(java-pkg_getjars ${deep_jars} ${dependency})" \
 +			|| die "getjars failed for ${dependency}"
 +	done
 +	for dependency in ${JAVA_CLASSPATH_EXTRA}; do
-+		classpath="${classpath}:$(java-pkg_getjars ${getjars_args} ${dependency})" \
++		classpath="${classpath}:$(java-pkg_getjars ${buildonly_jars} ${deep_jars} ${dependency})" \
  			|| die "getjars failed for ${dependency}"
  	done
  	while [[ $classpath = *::* ]]; do classpath="${classpath//::/:}"; done
