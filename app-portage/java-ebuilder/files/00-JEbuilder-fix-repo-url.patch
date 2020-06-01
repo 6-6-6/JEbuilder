@@ -1,0 +1,12 @@
+diff -Nur a/scripts/tree.sh d/scripts/tree.sh
+--- a/scripts/tree.sh	2019-11-27 17:49:27.000000000 +0800
++++ d/scripts/tree.sh	2020-05-19 14:39:58.983084448 +0800
+@@ -72,7 +72,7 @@
+     PA=${PA//_/-}
+ 
+     local M=${MA}-${MV}
+-    local SRC_URI="http://central.maven.org/maven2/${WORKDIR}/${MV}/${M}-sources.jar"
++    local SRC_URI="https://repo.maven.apache.org/maven2/${WORKDIR}/${MV}/${M}-sources.jar"
+ 
+     if [[ ! -f "${POMDIR}"/${M}.pom ]]; then
+         pushd "${POMDIR}" > /dev/null
