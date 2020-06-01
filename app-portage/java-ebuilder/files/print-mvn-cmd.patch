@@ -1,0 +1,12 @@
+diff -Nur a/src/main/java/org/gentoo/java/ebuilder/maven/MavenParser.java print-mvn-cmd/src/main/java/org/gentoo/java/ebuilder/maven/MavenParser.java
+--- a/src/main/java/org/gentoo/java/ebuilder/maven/MavenParser.java	2019-11-27 17:49:27.000000000 +0800
++++ print-mvn-cmd/src/main/java/org/gentoo/java/ebuilder/maven/MavenParser.java	2020-05-19 16:20:20.902025907 +0800
+@@ -103,6 +103,8 @@
+                 "-Doutput=" + outputPath);
+         processBuilder.directory(config.getWorkdir().toFile());
+ 
++	System.out.println("mvn -f " + pomFile.toString() + " help:effective-pom -Doutput=" + outputPath);
++
+         final Process process;
+ 
+         try {

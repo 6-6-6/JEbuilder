@@ -1,0 +1,13 @@
+diff -Nur a/src/main/java/org/gentoo/java/ebuilder/maven/MavenCache.java print-cache-file/src/main/java/org/gentoo/java/ebuilder/maven/MavenCache.java
+--- a/src/main/java/org/gentoo/java/ebuilder/maven/MavenCache.java	2019-11-27 17:49:27.000000000 +0800
++++ print-cache-file/src/main/java/org/gentoo/java/ebuilder/maven/MavenCache.java	2020-05-19 16:48:26.764009519 +0800
+@@ -98,6 +98,9 @@
+ 
+         cache.clear();
+ 
++	System.out.print("Here is my cache file:");
++	System.out.println(config.getCacheFile());
++
+         try (final BufferedReader reader = new BufferedReader(
+                 new FileReader(config.getCacheFile().toFile()))) {
+             String line = reader.readLine();
