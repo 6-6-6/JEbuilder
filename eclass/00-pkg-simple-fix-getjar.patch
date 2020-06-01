@@ -7,8 +7,8 @@
 +# @ECLASS-VARIABLE: JAVA_CLASSPATH_EXTRA
 +# @DEFAULT_UNSET
 +# @DESCRIPTION:
-+# Extra list of comma or space separated list of java packages
-+# which is needed only during compiling sources.
++# An extra comma or space separated list of java packages
++# that are needed only during compiling sources.
 +
  # @ECLASS-VARIABLE: JAVA_SRC_DIR
  # @DEFAULT_UNSET
