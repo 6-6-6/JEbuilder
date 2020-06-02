@@ -1,0 +1,21 @@
+diff -Nur a/src/main/java/org/gentoo/java/ebuilder/maven/MavenCache.java c/src/main/java/org/gentoo/java/ebuilder/maven/MavenCache.java
+--- a/src/main/java/org/gentoo/java/ebuilder/maven/MavenCache.java	2019-11-27 17:49:27.000000000 +0800
++++ c/src/main/java/org/gentoo/java/ebuilder/maven/MavenCache.java	2020-05-19 14:41:50.151083367 +0800
+@@ -24,7 +24,7 @@
+      * items.
+      */
+     private final Map<String, Map<String, List<CacheItem>>> cache
+-            = new HashMap<>(200);
++            = new HashMap<>();
+ 
+     /**
+      * Searches for system dependency using maven group id, artifact id and
+@@ -151,7 +151,7 @@
+                 = cache.get(cacheItem.getGroupId());
+ 
+         if (artifactIds == null) {
+-            artifactIds = new HashMap<>(100);
++            artifactIds = new HashMap<>();
+             cache.put(cacheItem.getGroupId(), artifactIds);
+         }
+ 
