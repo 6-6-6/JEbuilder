@@ -1,0 +1,12 @@
+diff -Nur b/src/main/java/org/gentoo/java/ebuilder/portage/MavenVersion.java b2/src/main/java/org/gentoo/java/ebuilder/portage/MavenVersion.java
+--- b/src/main/java/org/gentoo/java/ebuilder/portage/MavenVersion.java	2020-05-20 17:47:45.737135013 +0800
++++ b2/src/main/java/org/gentoo/java/ebuilder/portage/MavenVersion.java	2020-06-08 09:18:17.381740200 +0800
+@@ -14,7 +14,7 @@
+      * Pattern for parsing maven version number.
+      */
+     private static final Pattern PATTERN_VERSION = Pattern.compile(
+-            "^v?(\\d+)(?:\\.(\\d+))?(?:(?:\\.|b|beta)(\\d+))?(?:[\\.-](.*))?$");
++            "^[vr]?(\\d+)(?:\\.(\\d+))?(?:(?:\\.|b|beta)(\\d+))?(?:[\\.-]?(.*))?$");
+     /**
+      * Pattern for parsing maven version range.
+      */
