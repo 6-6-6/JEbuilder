@@ -1,0 +1,4 @@
+echo \{\} > LUT
+./cache2LUT --src-cache ./materials/cache.0 --LUT LUT
+./cache2LUT --src-cache ./materials/cache.1 --LUT LUT
+./cache2LUT --src-cache handmade.cache --LUT LUT
