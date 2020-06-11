@@ -7,6 +7,10 @@ EROOT=$(shell python -c "import portage;print(portage.root)")
 CONFIG?=${EROOT}/etc/java-ebuilder.conf
 include ${CONFIG}
 
+# Aritifact whose dependency to be fill
+HANDMADE_DIR?=${EROOT}/var/lib/java-ebuilder/maven/dev-java/
+HANDMADE?=$(shell find ${HANDMADE_DIR} -name *ebuild)
+
 # shells
 TSH=${EROOT}/usr/lib/java-ebuilder/tree.sh
 TSH_WRAPPER=${EROOT}/usr/lib/java-ebuilder/tree-wrapper.sh
@@ -21,13 +25,14 @@ STAGE2_MAKEFILE?=/tmp/stage2.mk
 STAGE3_MAKEFILE?=/tmp/maven.mk
 
 # PORTAGE REPOS
-## portage di
+## portage dir
 NULLDIR=$(shell portageq get_repo_path ${EROOT} wxxwswddadafef22SA)
 PORTDIR?=$(shell portageq get_repo_path ${EROOT} gentoo)
 JAVA_OVERLAY_DIR?=$(shell portageq get_repo_path ${EROOT} java-overlay)
 
 # cache
 LUTFILE?=${EROOT}/usr/lib/java-ebuilder/LUT/LUT
+STAGE0_CACHE?=${CACHEDIR}/stage0-cache
 PRE_STAGE1_CACHE?=${CACHEDIR}/pre-stage1-cache
 PRE_STAGE3_CACHE?=${CACHEDIR}/pre-stage3-cache
 STAGE2_CACHE?=${CACHEDIR}/stage2-cache
@@ -39,3 +44,6 @@ ifneq (${JAVA_OVERLAY_DIR}, ${NULLDIR})
 endif
 
 
+null:
+	echo ${HANDMADE_DIR}
+	echo ${HANDMADE}

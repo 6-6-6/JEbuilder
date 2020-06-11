@@ -10,9 +10,11 @@ ${CACHEDIR}/java.cache.raw:
 
 ${CACHEDIR}/java.cache: ${CACHEDIR}/java.cache.raw
 	${FILL_CACHE} --dst-cache $@ --src-cache $^ --LUT ${LUTFILE}
-	
-${PRE_STAGE1_CACHE}: ${CACHE_TARGET}
-	echo 1.0 > $@
+
+${STAGE0_CACHE}:
+	java-ebuilder --refresh-cache -t ${EROOT}/var/lib/java-ebuilder/maven/ --cache-file $@
+
+${PRE_STAGE1_CACHE}: ${STAGE0_CACHE} ${CACHE_TARGET} 
 	cat $^ >> $@
 
 ${STAGE2_CACHE}: ${STAGE2_MAKEFILE}

@@ -11,4 +11,4 @@ include stage3.mk
 
 all: stage3
 
-clean: clean-cache clean-stage1
+clean: clean-cache clean-stage1 clean-stage2 clean-stage3
