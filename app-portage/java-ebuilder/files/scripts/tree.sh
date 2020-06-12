@@ -95,6 +95,7 @@ get_maven() {
 
 # generate ebuild file
 gebd() {
+    tsh_log "gebd: MID is $PG:$MA:$MV"
     local WORKDIR=${PG//./\/}/${MA} MID
     local PA SLOT
 
@@ -161,6 +162,7 @@ gebd() {
 
     if [[ ! -f "${cur_stage_ebd}" ]]; then
         mkdir -p $(dirname ${cur_stage_ebd})
+        tsh_log "java-ebuilder: generage ebuild files for ${MID} in ${CUR_STAGE}"
         java-ebuilder -p "${POMDIR}"/${M}.pom -e "${cur_stage_ebd}" -g --workdir . \
                       -u ${SRC_URI} --slot ${SLOT:-0} --keywords ~amd64 \
                       --cache-file "${CACHEDIR}"/${CUR_STAGE}-cache
@@ -176,7 +178,7 @@ gebd() {
     target_line+="\n"
     target_line+="${final_stage_ebd}: "
     
-    [[ -z "${MAVEN_NODEP}" ]] && mfill "${cur_stage_ebd}"
+    [[ -z "${MAVEN_NODEP}" ]] && MAKEFILE_DEP=1 mfill "${cur_stage_ebd}"
     
     target_line+="\n"
     target_line+="\tmkdir -p $(dirname ${final_stage_ebd})"
@@ -192,25 +194,27 @@ gebd() {
         echo -e $target_line >> ${TARGET_MAKEFILE}
     fi
 }
-#!/bin/bash
 
 # filling dependencies
 mfill() {
     # recursively fill missing dependencies
     arts=$(sed -n -r 's,# (test\? )?(.*) -> !!!.*-not-found!!!,\2,p' < $1)
-    tsh_log $1
+    tsh_log "mfill: dealing with $1"
     if [[ -z "${arts}" ]]; then
-        false # no need to java-ebuilder again
+        return # no need to java-ebuilder again
     else
         for a in ${arts}; do
             eval $(awk -F":" '{print "PG="$1, "MA="$2, "MV=""\x27"$3"\x27"}' <<< ${a})
-            MAKEFILE_DEP=1 gebd
+            gebd
         done
         return
     fi
 }
 
-if [[ $1 == *.ebuild ]]; then
+if [[ ! -z ${JUST_MFILL} ]]; then
+    mfill $1
+    exit $?
+elif [[ $1 == *.ebuild ]]; then
     eval $(grep MAVEN_ID $1)
     eval $(grep MAVEN_FORCE $1)
     #rm -f $1
