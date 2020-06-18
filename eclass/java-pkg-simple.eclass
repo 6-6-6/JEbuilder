@@ -51,6 +51,13 @@ S="${WORKDIR}"
 # An extra comma or space separated list of java packages
 # that are needed only during compiling sources.
 
+# @ECLASS-VARIABLE: JAVA_NEEDS_TOOLS
+# @DEFAULT_UNSET
+# @DESCRIPTION:
+# add tools.jar to the gentoo.classpath. Should only be used
+#       for build-time purposes, the dependency is not recorded to
+#       package.env!
+
 # @ECLASS-VARIABLE: JAVA_SRC_DIR
 # @DEFAULT_UNSET
 # @DESCRIPTION:
@@ -104,6 +111,7 @@ java-pkg-simple_src_compile() {
 
 	# compile
 	local classpath="${JAVA_GENTOO_CLASSPATH_EXTRA}" dependency
+	[[ ${JAVA_NEEDS_TOOLS} ]] && classpath+=":$(java-config --tools)"
 	for dependency in ${JAVA_GENTOO_CLASSPATH}; do
 		classpath="${classpath}:$(java-pkg_getjars ${deep_jars} ${dependency})" \
 			|| die "getjars failed for ${dependency}"
