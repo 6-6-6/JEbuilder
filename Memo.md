@@ -12,4 +12,6 @@
 
 - [ ] dev-java/jna: a good example of placing .so files
 
-- [ ] feature: covert jdk(or jre) [2-8] into 1.[2-8]
+- [x] feature: covert jdk(or jre) [2-8] into 1.[2-8]
+
+- [ ] feature: check pom.xml, and determine whether to set JAVA\_NEEDS\_TOOLS
