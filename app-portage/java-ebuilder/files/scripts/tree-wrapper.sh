@@ -13,6 +13,7 @@ for artifact in ${SEED_DIR}/*ebuild; do
 	[[ $? -ne 0 ]] && echo While processing $artifact, TSH returned an error && exit 1
 done
 
+HANDMADE_EBUILDS=$(find ${HANDMADE_DIR} -name *ebuild)
 for artifact in ${HANDMADE_EBUILDS}; do
 	JUST_MFILL=1 $TSH $artifact
 	[[ $? -ne 0 ]] && echo While processing $artifact, TSH returned an error && exit 1

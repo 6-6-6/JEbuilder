@@ -4,6 +4,8 @@
 
 source $CONFIG
 
+REPOSITORY="https://repo.maven.apache.org/maven2"
+
 tsh_log() {
     [[ ! -z "TSH_DEBUG" ]] && echo [x] $*
 }
@@ -50,17 +52,18 @@ sver() {
     # if generate multiple dots, reduce them into single dot
     sed 's/\.\+/\./g' <<< ${PV}
 }
-#!/bin/bash
 
 # get an existing maven version
 get_maven() {
-    local MV_RANGE=${MV}
+    tsh_log get_maven: MV_RANGE = ${MV}, MID = ${PG}:${MA}
+    local MV_RANGE=${MV} FOUND_JAR
     if [[ -z "${MAVEN_FORCE_VERSION}" ]]; then
         local nversions=$(xmllint --xpath "/metadata/versioning/versions/version/text()" "${ARTIFACT_METADATA}" | wc -l)
     else
         local nversions=1
     fi
 
+    #for line_number in $(seq ${nversions} -1 1); do
     for line_number in $(seq ${nversions} -1 1); do
         if [[ -z "${MAVEN_FORCE_VERSION}" ]]; then
             MV=$(xmllint --xpath "/metadata/versioning/versions/version/text()" "${ARTIFACT_METADATA}" | awk "NR==${line_number}{print $1}")
@@ -76,28 +79,30 @@ get_maven() {
         MID=${PG}:${MA}:${MV}
         PV=$(sver ${MV})
         M=${MA}-${MV}
-        SRC_URI="https://repo.maven.apache.org/maven2/${WORKDIR}/${MV}/${M}-sources.jar"
-        POM_URI="https://repo.maven.apache.org/maven2/${WORKDIR}/${MV}/${M}.pom"
+        SRC_URI="${REPOSITORY}/${WORKDIR}/${MV}/${M}-sources.jar"
+        POM_URI="${REPOSITORY}/${WORKDIR}/${MV}/${M}.pom"
         if ! wget -q --spider ${SRC_URI}; then
             TMP_SRC_URI=${SRC_URI/-sources.jar/.jar}
 	    if wget -q --spider ${TMP_SRC_URI}; then
 	        SRC_URI=${TMP_SRC_URI}
-                PA=${PA}-bin
-	        break
+                PA=${PA}
+                return 0
 	    fi
 	else
-	    break
+	    return 0
         fi
     done
+
+    # if we cannot found a suitble version
+    return 1
 }
 
-#!/bin/bash
 
 # generate ebuild file
 gebd() {
     tsh_log "gebd: MID is $PG:$MA:$MV"
     local WORKDIR=${PG//./\/}/${MA} MID
-    local PA SLOT
+    local CATEGORY PA SLOT
 
     # spark-launcher_2.11 for scala 2.11
     eval $(sed -nr 's,([^_]*)(_(.*))?,PA=\1 SLOT=\3,p' <<< ${MA})
@@ -108,7 +113,13 @@ gebd() {
     [[ ! -z "${MAVEN_FORCE_PA}" ]] && PA=${MAVEN_FORCE_PA} && unset MAVEN_FORCE_PA
     [[ ! -z "${MAVEN_FORCE_SLOT}" ]] && SLOT=${MAVEN_FORCE_SLOT} && unset MAVEN_FORCE_SLOT
 
-    local METADATA_URI="https://repo.maven.apache.org/maven2/${WORKDIR}/maven-metadata.xml"
+    CATEGORY=$(grep "${PG}:${MA}:" "${CACHEDIR}"/${CUR_STAGE}-cache | awk -F: 'NR==1{print $1}')
+    #[[ -z "${CATEGORY}" ]] || PA=$(grep "${PG}:${MA}:" "${CACHEDIR}"/${CUR_STAGE}-cache | awk -F: 'NR==1{print $2}')
+    [[ -z "${CATEGORY}" ]] && CATEGORY=app-maven
+
+    tsh_log "gebd: CATEGORY is ${CATEGORY}, PA is ${PA}"
+
+    local METADATA_URI="${REPOSITORY}/${WORKDIR}/maven-metadata.xml"
     local ARTIFACT_METADATA="${POMDIR}/metadata-${PG}-${MA}.xml"
     if [[ ! -f ${ARTIFACT_METADATA} ]]; then
         pushd "${POMDIR}" > /dev/null
@@ -118,17 +129,7 @@ gebd() {
 
     local MID PV M SRC_URI POM_URI
 
-    case ${MA} in
-        jetty*)
-	    MAVEN_FORCE_VERSION=1
-	    ;;
-    esac
-    if [[ ! -f ${ARTIFACT_METADATA} ]]; then
-        MAVEN_FORCE_VERSION=1 get_maven
-    else
-        get_maven
-    fi
-    unset MAVEN_FORCE_VERSION
+    MAVEN_FORCE_VERSION=1 get_maven || get_maven
 
     if [[ ! -f "${POMDIR}"/${M}.pom ]]; then
         pushd "${POMDIR}" > /dev/null
@@ -147,11 +148,11 @@ gebd() {
     fi
 
     local P=${PA}-${PV}
-    local cur_stage_ebd="${CUR_STAGE_DIR}"/app-maven/${PA}/${P}.ebuild
-    local final_stage_ebd="${MAVEN_OVERLAY_DIR}"/app-maven/${PA}/${P}.ebuild
+    local cur_stage_ebd="${CUR_STAGE_DIR}"/${CATEGORY}/${PA}/${P}.ebuild
+    local final_stage_ebd="${MAVEN_OVERLAY_DIR}"/${CATEGORY}/${PA}/${P}.ebuild
 
 
-    line=app-maven:${PA}:${PV}:${SLOT:-0}::${MID}
+    line=${CATEGORY}:${PA}:${PV}:${SLOT:-0}::${MID}
     if ! grep -q ${line} "${CACHEDIR}"/${CUR_STAGE}-maven-cache 2>/dev/null ; then
         pushd "${CACHEDIR}" > /dev/null
         echo ${line} >> ${CUR_STAGE}-maven-cache
@@ -216,10 +217,11 @@ if [[ ! -z ${JUST_MFILL} ]]; then
     exit $?
 elif [[ $1 == *.ebuild ]]; then
     eval $(grep MAVEN_ID $1)
-    eval $(grep MAVEN_FORCE $1)
+    eval $(grep MAVEN_FORCE_PA $1)
+    eval $(grep MAVEN_FORCE_CATEGORY $1)
     #rm -f $1
 else
     MAVEN_ID=$1
 fi
 eval $(awk -F":" '{print "PG="$1, "MA="$2, "MV="$3}' <<< ${MAVEN_ID})
-MAVEN_FORCE_VERSION=1 gebd
+gebd
