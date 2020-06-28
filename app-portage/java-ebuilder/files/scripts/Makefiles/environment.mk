@@ -8,8 +8,7 @@ CONFIG?=${EROOT}/etc/java-ebuilder.conf
 include ${CONFIG}
 
 # Aritifact whose dependency to be fill
-HANDMADE_DIR?=${EROOT}/var/lib/java-ebuilder/maven/dev-java/
-HANDMADE?=$(shell find ${HANDMADE_DIR} -name *ebuild)
+HANDMADE_DIR?=${EROOT}/var/lib/java-ebuilder/stage0/
 
 # shells
 TSH=${EROOT}/usr/lib/java-ebuilder/tree.sh

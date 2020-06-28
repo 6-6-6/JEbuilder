@@ -12,13 +12,14 @@ ${CACHEDIR}/java.cache: ${CACHEDIR}/java.cache.raw
 	${FILL_CACHE} --dst-cache $@ --src-cache $^ --LUT ${LUTFILE}
 
 ${STAGE0_CACHE}:
-	java-ebuilder --refresh-cache -t ${EROOT}/var/lib/java-ebuilder/maven/ --cache-file $@
+	java-ebuilder --refresh-cache -t ${EROOT}/var/lib/java-ebuilder/stage0/ --cache-file $@
 
 ${PRE_STAGE1_CACHE}: ${STAGE0_CACHE} ${CACHE_TARGET} 
-	cat $^ >> $@
+	cat $^ > $@
 
 ${STAGE2_CACHE}: ${STAGE2_MAKEFILE}
 	make -f "$^" all -j
+	cp ${MAVEN_OVERLAY_DIR}/../stage0/* ${MAVEN_OVERLAY_DIR}/ -r
 	java-ebuilder --refresh-cache -t "${MAVEN_OVERLAY_DIR}" --cache-file $@
 	
 ${PRE_STAGE3_CACHE}: ${STAGE2_CACHE} ${CACHE_TARGET}
