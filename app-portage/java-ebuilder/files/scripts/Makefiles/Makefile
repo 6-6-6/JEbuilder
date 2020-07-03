@@ -1,9 +1,11 @@
 
-include environment.mk
-include cache.mk
-include stage1.mk
-include stage2.mk
-include stage3.mk
+MAKEFILE_DIR?=./
+
+include ${MAKEFILE_DIR}/environment.mk
+include ${MAKEFILE_DIR}/cache.mk
+include ${MAKEFILE_DIR}/stage1.mk
+include ${MAKEFILE_DIR}/stage2.mk
+include ${MAKEFILE_DIR}/stage3.mk
 
 #include ${STAGE2_MAKEFILE}
 
