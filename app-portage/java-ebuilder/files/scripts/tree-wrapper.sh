@@ -8,7 +8,8 @@ source ${CONFIG}
 mkdir -p "${POMDIR}"
 mkdir -p "${CUR_STAGE_DIR}/app-maven"
 
-for artifact in ${SEED_DIR}/*ebuild; do
+SEEDS=$(find ${SEED_DIR} -name *ebuild)
+for artifact in ${SEEDS}; do
 	$TSH $artifact
 	[[ $? -ne 0 ]] && echo While processing $artifact, TSH returned an error && exit 1
 done

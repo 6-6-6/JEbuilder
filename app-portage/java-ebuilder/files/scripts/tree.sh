@@ -164,7 +164,7 @@ gebd() {
     if [[ ! -f "${cur_stage_ebd}" ]]; then
         mkdir -p $(dirname ${cur_stage_ebd})
         tsh_log "java-ebuilder: generage ebuild files for ${MID} in ${CUR_STAGE}"
-        java-ebuilder -p "${POMDIR}"/${M}.pom -e "${cur_stage_ebd}" -g --workdir . \
+        java-ebuilder -p "${POMDIR}"/${M}.pom -e "${cur_stage_ebd}" -g --workdir "${POMDIR}" \
                       -u ${SRC_URI} --slot ${SLOT:-0} --keywords ~amd64 \
                       --cache-file "${CACHEDIR}"/${CUR_STAGE}-cache
 	RET=$?
@@ -184,8 +184,9 @@ gebd() {
     target_line+="\n"
     target_line+="\tmkdir -p $(dirname ${final_stage_ebd})"
     target_line+="\n"
-    target_line+="\tjava-ebuilder -p \"${POMDIR}\"/${M}.pom -e \"${final_stage_ebd}\" -g --workdir . "
-    target_line+="-u ${SRC_URI} --slot ${SLOT:-0} --keywords ~amd64 "
+    target_line+="\tjava-ebuilder -p \"${POMDIR}\"/${M}.pom -e \"${final_stage_ebd}\" -g --workdir \"${POMDIR}\""
+    target_line+=" -u ${SRC_URI} --slot ${SLOT:-0} --keywords ~amd64"
+    [[ ${SRC_URI} = *-sources.jar ]] && target_line+=" --from-maven-central"
     target_line+=" --cache-file \"${CACHEDIR}\"/${CUR_STAGE}-cache"
     target_line+="\n"
     [[ ${SRC_URI} = *-sources.jar ]] || target_line+="\tsed -i \"/inherit/s/java-pkg-simple/java-pkg-binjar/\" \"${final_stage_ebd}\""
@@ -225,3 +226,4 @@ else
 fi
 eval $(awk -F":" '{print "PG="$1, "MA="$2, "MV="$3}' <<< ${MAVEN_ID})
 gebd
+tsh_log "Tree.sh: reaching the end of the script"
